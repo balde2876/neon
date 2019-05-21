@@ -2,10 +2,9 @@ package neon;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL15.*;
+//import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL21.*;
-
+//import static org.lwjgl.opengl.GL21.*;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -13,16 +12,16 @@ import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-import static org.lwjgl.bgfx.BGFX.*;
+//import static org.lwjgl.bgfx.BGFX.*;
 
 import org.lwjgl.opengl.GL;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.bgfx.BGFXVertexDecl;
-import org.lwjgl.glfw.GLFW;
+//import org.lwjgl.bgfx.BGFXVertexDecl;
+//import org.lwjgl.glfw.GLFW;
 import org.lwjgl.system.MemoryStack;
-import org.lwjgl.system.MemoryUtil;
+//import org.lwjgl.system.MemoryUtil;
 
 public class Neon {
 	public Neon() {
@@ -63,90 +62,16 @@ public class Neon {
 		
 		float light_position[] = { 0.0f, 0.0f, 10.0f, 0.0f };
 		glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+	
+		//float x = 0;
 		
-		float[] textureCoordsMultiSidedBlock = {
-				0,0.25f,
-				0,0.5f,
-				0.25f,0.5f,
-				0.25f,0.25f,
-				
-				0,0,
-				0,0.25f,
-				0.25f,0.25f,
-				0.25f,0,
-				
-				0.75f,0.5f,
-				0.5f,0.5f,
-				0.5f,0.25f,
-				0.75f,0.25f,
-				
-				0.25f,0.5f,
-				0.5f,0.5f,
-				0.5f,0.25f,
-				0.25f,0.25f,
-				
-				0.75f,0,
-				0.75f,0.25f,
-				0.5f,0.25f,
-				0.5f,0,
-				
-				0.25f,0,
-				0.25f,0.25f,
-				0.5f,0.25f,
-				0.5f,0,
-		};
-		
-		float[] textureCoordsUniformBlock = {
-				0,0.25f,
-				0,0.5f,
-				0.25f,0.5f,
-				0.25f,0.25f,
-				0,0.25f,
-				0,0.5f,
-				0.25f,0.5f,
-				0.25f,0.25f,
-				0,0.25f,
-				0,0.5f,
-				0.25f,0.5f,
-				0.25f,0.25f,
-				0,0.25f,
-				0,0.5f,
-				0.25f,0.5f,
-				0.25f,0.25f,
-				0,0.25f,
-				0,0.5f,
-				0.25f,0.5f,
-				0.25f,0.25f,
-				0,0.25f,
-				0,0.5f,
-				0.25f,0.5f,
-				0.25f,0.25f,
-		};
-		
-		//Model modelMultiSidedBlock = new Model(verticesBlock, textureCoordsMultiSidedBlock, indicesBlock);
-		//Model modelUniformBlock = new Model(verticesBlock, textureCoordsUniformBlock, indicesBlock);
-		
-		Texture texture = new Texture("./assets/terrain.png");
-		
-		//StaticShader shader = new StaticShader();
-		
-		
-		
-		float x = 0;
-		
-		Vector3f cameraRotation = new Vector3f(-0.7f,0.0f,0.0f);
-		Vector3f cameraPosition = new Vector3f(0.0f,0.0f,256.0f);
-		
-		//Chunk chunkvar = new Chunk(0, 0, 0, "nice");
+		Vector3f cameraRotation = new Vector3f((float) (-Math.PI/2),0.0f,0.0f);
+		Vector3f playerPosition = new Vector3f(0.0f,0.0f,32.0f);
 		
 		Chunk[] loadedChunks = new Chunk[] {};
-		
 		int seed = 177014;
-		
 		int worldRadius = 6;
-		
 		System.out.println("Set world render distance to ".concat(Integer.toString(worldRadius * 32)).concat("m "));
-		
 		for (int blkx=-worldRadius; blkx<worldRadius; blkx++) {
 			for (int blky=-worldRadius; blky<worldRadius; blky++) {
 				for (int blkz=-1; blkz<2; blkz++) {
@@ -156,16 +81,6 @@ public class Neon {
 				}
 			}
 		}
-		
-//		Chunk newChunk = new Chunk(0, 0, 0, seed);
-//		loadedChunks = ArrayHelper.push(loadedChunks,newChunk);
-//		newChunk.generateSurface();
-//		
-//		loadedChunks[4] = new Chunk(0, 1, 0, seed);
-//		loadedChunks[5] = new Chunk(0, 2, 0, seed);
-//		loadedChunks[6] = new Chunk(0, -2, 0, seed);
-//		loadedChunks[7] = new Chunk(0, -3, 0, seed);
-		
 		
 		int shaderProgram = glCreateProgram();
 		int vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -214,6 +129,8 @@ public class Neon {
 		glClearColor(0.6f,0.9f,1.0f,0.0f);
 		
 		Model modelChunk;
+
+		Texture texture = new Texture("./assets/terrain.png");
 		
 		while(glfwWindowShouldClose(win) != true) {
 			
@@ -231,8 +148,20 @@ public class Neon {
 			}
 			
 			if(glfwGetKey(win, GLFW_KEY_W) == GL_TRUE) {
-				System.out.println("w");
-				x = x + 0.001f;
+				//System.out.println("w");
+				playerPosition.y = playerPosition.y + 0.1f;
+			}
+			if(glfwGetKey(win, GLFW_KEY_A) == GL_TRUE) {
+				//System.out.println("w");
+				playerPosition.x = playerPosition.x - 0.1f;
+			}
+			if(glfwGetKey(win, GLFW_KEY_S) == GL_TRUE) {
+				//System.out.println("w");
+				playerPosition.y = playerPosition.y - 0.1f;
+			}
+			if(glfwGetKey(win, GLFW_KEY_D) == GL_TRUE) {
+				//System.out.println("w");
+				playerPosition.x = playerPosition.x + 0.1f;
 			}
 			
 			if(glfwGetMouseButton(win,0) == GL_TRUE) {
@@ -259,7 +188,7 @@ public class Neon {
 			
 			//cameraRotation.x = (float) (cameraRotation.x + ((Math.PI * 0.5 * 16)/1000f));
 			//cameraRotation.y = (float) (cameraRotation.y + ((Math.PI * 0.3 * 16)/1000f));
-			cameraRotation.z = (float) (cameraRotation.z + ((Math.PI * 0.05 * 16)/1000f));
+			//cameraRotation.z = (float) (cameraRotation.z + ((Math.PI * 0.05 * 16)/1000f));
 		
 			//Matrix4f perspective = Matrix4f.CreatePerspectiveFieldOfView(1.04, 4 / 4, 1, 10000) //Setup Perspective
 			Matrix4f viewMatrix = new Matrix4f();
@@ -271,10 +200,10 @@ public class Neon {
 			
 			
 			viewMatrix.
-	        translate(-cameraPosition.x, -cameraPosition.y, -cameraPosition.z).
 	        rotateX((float)cameraRotation.x).
 	        rotateY((float)cameraRotation.y).
-	        rotateZ((float)cameraRotation.z);
+	        rotateZ((float)cameraRotation.z).
+	        translate(-playerPosition.x, -playerPosition.y, -playerPosition.z);
 			
 			Matrix4f perspectiveMatrix = new Matrix4f();
 			perspectiveMatrix.perspective((float) Math.toRadians(45), (float)width/height, 0.1f, 10000.0f); // last point is render distance
