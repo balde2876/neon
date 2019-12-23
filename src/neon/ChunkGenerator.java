@@ -9,14 +9,10 @@ public class ChunkGenerator extends Thread {
 	public long[] lastBlockChange = new long[] {System.currentTimeMillis()};
 	public Chunk[] chunksAvaliable;
 	
-	public void run() 
-    { 
-        try
-        { 
+	public void run() { 
+        try { 
             // Displaying the thread that is running 
-            System.out.println ("Thread " + 
-                  Thread.currentThread().getId() + 
-                  " is running"); 
+        	Neon.logger.logInfo("Thread " + Thread.currentThread().getId() + " ( Chunk Generator ) is running"); 
     		PerlinNoise noiseGenerator = new PerlinNoise(seed);
     		PerlinNoise noiseGeneratorArid = new PerlinNoise(seed+32);
     		PerlinNoise noiseGeneratorMountain = new PerlinNoise(seed+64);
@@ -216,9 +212,7 @@ public class ChunkGenerator extends Thread {
     			}
 			}
 			
-    		System.out.println ("Thread " + 
-                    Thread.currentThread().getId() + 
-                    " has completed"); 
+			Neon.logger.logInfo ("Thread " + Thread.currentThread().getId() + " ( Chunk Generator ) has completed"); 
     		//lastBlockChange[0] = System.currentTimeMillis();
     		lastBlockChange[0] = System.currentTimeMillis();
     		for (int chkid=0; chkid<chunksAvaliable.length; chkid++) {
@@ -230,11 +224,9 @@ public class ChunkGenerator extends Thread {
     			}
     		}
             
-        } 
-        catch (Exception e) 
-        { 
+        } catch (Exception e) { 
         	// Throwing an exception 
-            System.out.println("Exception is caught"); 
+        	Neon.logger.logError("Exception is caught"); 
             //System.err.println(e.getStackTrace());
             e.printStackTrace(System.err);
         } 
