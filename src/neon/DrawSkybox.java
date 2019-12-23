@@ -8,11 +8,11 @@ import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
 
 public class DrawSkybox {
-	private int rd = 100;
+	private float rd = 100;
 	private float[] ply = new float[3];
 	private Texture skyboxTexture = new Texture("./assets/skybox.png");
 	
-	public DrawSkybox (int renderDistance) {
+	public DrawSkybox (float renderDistance) {
 		rd = renderDistance;
 	}
 	

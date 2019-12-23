@@ -33,6 +33,11 @@ public class Neon {
 		int worldHeight = 2; // How far the player can see up or down
 		int worldRamRecoverRadius = worldRadius + 4; // How aggressive the ram reclaimer is
 		int concurrentChunkRenderingLevel = 128; // Threads used to create chunk surfaces
+		int width = 1280;
+		int height = 720;
+		
+		
+		float renderDistance = 10000f;
 		
 		if (glfwInit() != true) {
 			System.err.println("GLFW INIT FAILED");
@@ -47,11 +52,14 @@ public class Neon {
 		
 		glEnable(GL_TEXTURE_2D);
 		glEnable(GL_DEPTH_TEST);
+		
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
 		glFrontFace(GL_CW);
+		
 		//glDepthFunc(GL_LESS);
 		glDepthFunc(GL_LEQUAL);
+		
 		glEnable(GL_BLEND);
 	    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	   // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -85,6 +93,7 @@ public class Neon {
 	
 		
 		Chunk[] loadedChunks = new Chunk[] {};
+		
 		System.out.println("Set world render distance to ".concat(Integer.toString(worldRadius * 32)).concat("m "));
 		for (int blkx=-worldRadius; blkx<worldRadius; blkx++) {
 			for (int blky=-worldRadius; blky<worldRadius; blky++) {
@@ -96,7 +105,8 @@ public class Neon {
 			}
 		}
 		
-//		Chunk newChunk = new Chunk(0, 0, -1, seed, loadedChunks);
+//		System.out.println("Ignoring render distance, in debug mode");
+//		Chunk newChunk = new Chunk(0, 0, 0, seed, loadedChunks);
 //		loadedChunks = ArrayHelper.push(loadedChunks,newChunk);
 		
 		int shaderProgram = glCreateProgram();
@@ -163,7 +173,9 @@ public class Neon {
 		float light_position[] = { 0.0f, 20.0f, 100.0f, 0.75f };
 		glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 		
-		DrawSkybox SkyboxRenderer = new DrawSkybox(32*(worldRadius+1));
+		//DrawSkybox SkyboxRenderer = new DrawSkybox(32*(worldRadius+1));
+		DrawSkybox SkyboxRenderer = new DrawSkybox(renderDistance * (float) Math.pow((float) Math.sin(Math.PI / 4),3f) );
+		
 		Draw2D Renderer2D = new Draw2D();
 		Draw2D TextRenderer2D = new Draw2D();
 		
@@ -234,8 +246,6 @@ public class Neon {
 			glClear(GL_DEPTH_BUFFER_BIT);
 			glClear(GL_COLOR_BUFFER_BIT);
 			
-			int width = 1280;
-			int height = 720;
 			try (MemoryStack stack = MemoryStack.stackPush()) {
 				IntBuffer pWidth = stack.mallocInt(1);
 				IntBuffer pHeight = stack.mallocInt(1);
@@ -269,7 +279,7 @@ public class Neon {
 	        translate(-playerPosition.x, -playerPosition.y, -playerPosition.z);
 			
 			Matrix4f perspectiveMatrix = new Matrix4f();
-			perspectiveMatrix.perspective((float) Math.toRadians(45), (float)width/height, 0.1f, 10000.0f); // last point is render distance
+			perspectiveMatrix.perspective((float) Math.toRadians(45), (float)width/height, 0.1f, renderDistance); // last point is render distance
 
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
@@ -305,39 +315,42 @@ public class Neon {
 			
 			int[] currentChunkLocation = new int[] {(int) Math.floor(playerPosition.x/32f),(int) Math.floor(playerPosition.y/32f),(int) Math.floor(playerPosition.z/32f)};
 			
-//			for (int blkx=-worldRadius+currentChunkLocation[0]; blkx<worldRadius+currentChunkLocation[0]; blkx++) {
-//				for (int blky=-worldRadius+currentChunkLocation[1]; blky<worldRadius+currentChunkLocation[1]; blky++) {
-//					for (int blkz=-worldHeight+currentChunkLocation[2]; blkz<worldHeight+currentChunkLocation[2]; blkz++) {
-//						boolean chunkNeedsLoading = true;
-//						for (int chkid=0; chkid<loadedChunks.length; chkid++) {
-//							if (loadedChunks[chkid].x == blkx) { if (loadedChunks[chkid].y == blky) { if (loadedChunks[chkid].z == blkz) {
-//								//System.out.println("Chunks Already Loaded : ".concat(Integer.toString(blkx)).concat(",").concat(Integer.toString(blky)).concat(",").concat(Integer.toString(blkz)));
-//								chunkNeedsLoading = false;
-//							}}}
-//						}
-//						if (chunkNeedsLoading) {
-//							Chunk newChunk2 = new Chunk(blkx, blky, blkz, seed, loadedChunks);
-//							loadedChunks = ArrayHelper.push(loadedChunks,newChunk2);
-//							//System.out.println("Chunks Loaded: ".concat(Integer.toString(loadedChunks.length)));
-//						}
-//						//Chunk newChunk = new Chunk(blkx, blky, blkz, seed);
-//						//loadedChunks = ArrayHelper.push(loadedChunks,newChunk);
-//						//newChunk.generateSurface();
-//					}
-//				}
-//			}
-			
 			int currentlyRendering = 0;
 			int currentlyRendered = 0;
 			
-//			for (int chkid=0; chkid<loadedChunks.length; chkid++) {
-//				if (loadedChunks[chkid].chunkModelStatus[1]) { // if the chunk is currently rendering
-//					currentlyRendering = currentlyRendering + 1;
-//				}
-//				if (loadedChunks[chkid].chunkModelStatus[2]) { // if the chunk is ready to be drawn
-//					currentlyRendered = currentlyRendered + 1;
-//				}
-//			}
+			
+			//Code for dynamically loading chunks
+			for (int blkx=-worldRadius+currentChunkLocation[0]; blkx<worldRadius+currentChunkLocation[0]; blkx++) {
+				for (int blky=-worldRadius+currentChunkLocation[1]; blky<worldRadius+currentChunkLocation[1]; blky++) {
+					for (int blkz=-worldHeight+currentChunkLocation[2]; blkz<worldHeight+currentChunkLocation[2]; blkz++) {
+						boolean chunkNeedsLoading = true;
+						for (int chkid=0; chkid<loadedChunks.length; chkid++) {
+							if (loadedChunks[chkid].x == blkx) { if (loadedChunks[chkid].y == blky) { if (loadedChunks[chkid].z == blkz) {
+								//System.out.println("Chunks Already Loaded : ".concat(Integer.toString(blkx)).concat(",").concat(Integer.toString(blky)).concat(",").concat(Integer.toString(blkz)));
+								chunkNeedsLoading = false;
+							}}}
+						}
+						if (chunkNeedsLoading) {
+							Chunk newChunk2 = new Chunk(blkx, blky, blkz, seed, loadedChunks);
+							loadedChunks = ArrayHelper.push(loadedChunks,newChunk2);
+							//System.out.println("Chunks Loaded: ".concat(Integer.toString(loadedChunks.length)));
+						}
+						//Chunk newChunk = new Chunk(blkx, blky, blkz, seed);
+						//loadedChunks = ArrayHelper.push(loadedChunks,newChunk);
+						//newChunk.generateSurface();
+					}
+				}
+			}
+			
+			for (int chkid=0; chkid<loadedChunks.length; chkid++) {
+				if (loadedChunks[chkid].chunkModelStatus[1]) { // if the chunk is currently rendering
+					currentlyRendering = currentlyRendering + 1;
+				}
+				if (loadedChunks[chkid].chunkModelStatus[2]) { // if the chunk is ready to be drawn
+					currentlyRendered = currentlyRendered + 1;
+				}
+			}
+			//Code for dynamically loading chunks
 			
 			//System.out.println("OH = ".concat(Integer.toString(currentlyRendering)).concat(" CR = ").concat(Integer.toString(currentlyRendered)));
 			
