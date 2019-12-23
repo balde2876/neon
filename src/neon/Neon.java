@@ -27,20 +27,21 @@ import org.lwjgl.system.MemoryStack;
 //import org.lwjgl.system.MemoryUtil;
 
 public class Neon {
+	static Logger logger = new Logger();
+	
 	public Neon() {
 		int seed = 177013; // Seed for terrain generation
-		int worldRadius = 2; // How far the player can see
-		int worldHeight = 2; // How far the player can see up or down
+		int worldRadius = 4; // How far the player can see
+		int worldHeight = 3; // How far the player can see up or down
 		int worldRamRecoverRadius = worldRadius + 4; // How aggressive the ram reclaimer is
 		int concurrentChunkRenderingLevel = 128; // Threads used to create chunk surfaces
 		int width = 1280;
 		int height = 720;
 		
-		
 		float renderDistance = 10000f;
 		
 		if (glfwInit() != true) {
-			System.err.println("GLFW INIT FAILED");
+			logger.logFatalError("GLFW INIT FAILED");
 			System.exit(1);
 		}
 		
@@ -94,7 +95,7 @@ public class Neon {
 		
 		Chunk[] loadedChunks = new Chunk[] {};
 		
-		System.out.println("Set world render distance to ".concat(Integer.toString(worldRadius * 32)).concat("m "));
+		logger.logInfo("Set world render distance to ".concat(Integer.toString(worldRadius * 32)).concat("m "));
 		for (int blkx=-worldRadius; blkx<worldRadius; blkx++) {
 			for (int blky=-worldRadius; blky<worldRadius; blky++) {
 				for (int blkz=-1; blkz<2; blkz++) {
@@ -121,9 +122,9 @@ public class Neon {
 				vertexShaderSource.append(line).append("\n");
 			}
 			reader.close();
-			System.out.println("Vertex shader loaded");
+			logger.logInfo("Vertex shader loaded");
 		} catch (IOException e) {
-			System.err.println("Vertex shader couldn't be loaded");
+			logger.logFatalError("Vertex shader couldn't be loaded");
 			System.exit(1);
 		}
 		try {
@@ -133,21 +134,21 @@ public class Neon {
 				fragmentShaderSource.append(line).append("\n");
 			}
 			reader.close();
-			System.out.println("Fragment shader loaded");
+			logger.logInfo("Fragment shader loaded");
 		} catch (IOException e) {
-			System.err.println("Fragment shader couldn't be loaded");
+			logger.logFatalError("Fragment shader couldn't be loaded");
 			System.exit(1);
 		}
 		
 		glShaderSource(vertexShader, vertexShaderSource);
 	    glCompileShader(vertexShader);
 	    if (glGetShaderi(vertexShader, GL_COMPILE_STATUS) == GL_FALSE) {
-	        System.err.println("Vertex shader wasn't able to be compiled correctly.");
+	    	logger.logError("Vertex shader wasn't able to be compiled correctly.");
 	    }
 	    glShaderSource(fragmentShader, fragmentShaderSource);
 	    glCompileShader(fragmentShader);
 	    if (glGetShaderi(fragmentShader, GL_COMPILE_STATUS) == GL_FALSE) {
-	        System.err.println("Fragment shader wasn't able to be compiled correctly.");
+	    	logger.logError("Fragment shader wasn't able to be compiled correctly.");
 	    }
 	    
 	    glAttachShader(shaderProgram, vertexShader);
@@ -156,8 +157,6 @@ public class Neon {
         glValidateProgram(shaderProgram);
 		
 		glClearColor(0.6f,0.9f,1.0f,0.0f);
-		
-		Model modelChunk;
 
 		Texture terrainTexture = new Texture("./assets/terrain.png");
 		Texture UIFont = new Texture("./assets/font.png");
@@ -188,7 +187,7 @@ public class Neon {
 			glfwPollEvents();
 			
 			if(glfwGetKey(win, GLFW_KEY_ESCAPE) == GL_TRUE) {
-				System.out.println("Exiting");
+				logger.logInfo("Exiting by user input");
 				//glfwDestroyWindow(win);
 		        glDeleteProgram(shaderProgram);
 		        glDeleteShader(vertexShader);
@@ -235,7 +234,7 @@ public class Neon {
 			//JSONStringer json = new JSONStringer();
 			//System.out.println(JSONStringer.valueToString(xpos));
 			if(glfwGetMouseButton(win,0) == GL_TRUE) {
-				System.out.println("click");
+				logger.logInfo("Mouse info: click");
 			}
 			
 			//shader.start();
@@ -383,7 +382,6 @@ public class Neon {
 				if ( (chunkPosition[0]>worldRamRecoverRadius+1+currentChunkLocation[0] || chunkPosition[0]<-worldRamRecoverRadius-1+currentChunkLocation[0]) || 
 				     (chunkPosition[1]>worldRamRecoverRadius+1+currentChunkLocation[1] || chunkPosition[1]<-worldRamRecoverRadius-1+currentChunkLocation[1]) ||
 				     (chunkPosition[2]>worldRamRecoverRadius+1+currentChunkLocation[2] || chunkPosition[2]<-worldRamRecoverRadius-1+currentChunkLocation[2]) ) {
-					System.out.println("Chunk needs unloading");
 					loadedChunks = ArrayHelper.remove(loadedChunks,chkid);
 				}
 			}
