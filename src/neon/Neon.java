@@ -29,8 +29,8 @@ import org.lwjgl.system.MemoryStack;
 public class Neon {
 	public Neon() {
 		int seed = 177013; // Seed for terrain generation
-		int worldRadius = 2; // How far the player can see
-		int worldHeight = 2; // How far the player can see up or down
+		int worldRadius = 4; // How far the player can see
+		int worldHeight = 3; // How far the player can see up or down
 		int worldRamRecoverRadius = worldRadius + 4; // How aggressive the ram reclaimer is
 		int concurrentChunkRenderingLevel = 128; // Threads used to create chunk surfaces
 		int width = 1280;
