@@ -71,6 +71,22 @@ public class ChunkSurfaceGenerator extends Thread {
 			20,23,21,
 			23,22,21,
 	};
+	
+	private int[] oldIndicesBlock = {
+			0,1,3,	
+			3,1,2,
+			4,7,5,
+			7,6,5,
+			8,9,11,
+			11,9,10,
+			12,15,13,
+			15,14,13,
+			16,17,19,
+			19,17,18,
+			20,23,21,
+			23,22,21,
+	};
+	
 	private float[] textureCoordsStandard = {
 		0f,0f,
 		0f,1f,
@@ -98,19 +114,19 @@ public class ChunkSurfaceGenerator extends Thread {
 						if ((myBlockId != 0)) {
 							if (!isTransparent(myBlockId)) {
 								boolean isSurfaceBlock = false;
-//								if (isTransparent(getBlock(blkx-1,blky,blkz))) {surfaceBlocksFaces++; chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+3] = (short) myBlockId; }
-//								if (isTransparent(getBlock(blkx+1,blky,blkz))) {surfaceBlocksFaces++; chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+2] = (short) myBlockId; }
-//								if (isTransparent(getBlock(blkx,blky-1,blkz))) {surfaceBlocksFaces++; chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+5] = (short) myBlockId; }
-//								if (isTransparent(getBlock(blkx,blky+1,blkz))) {surfaceBlocksFaces++; chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+4] = (short) myBlockId; }
-//								if (isTransparent(getBlock(blkx,blky,blkz-1))) {surfaceBlocksFaces++; chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+0] = (short) myBlockId; }
-//								if (isTransparent(getBlock(blkx,blky,blkz+1))) {surfaceBlocksFaces++; chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+1] = (short) myBlockId; }
+								if (isTransparent(getBlock(blkx-1,blky,blkz))) {surfaceBlocksFaces++; chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+3] = (short) myBlockId; }
+								if (isTransparent(getBlock(blkx+1,blky,blkz))) {surfaceBlocksFaces++; chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+2] = (short) myBlockId; }
+								if (isTransparent(getBlock(blkx,blky-1,blkz))) {surfaceBlocksFaces++; chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+5] = (short) myBlockId; }
+								if (isTransparent(getBlock(blkx,blky+1,blkz))) {surfaceBlocksFaces++; chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+4] = (short) myBlockId; }
+								if (isTransparent(getBlock(blkx,blky,blkz-1))) {surfaceBlocksFaces++; chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+0] = (short) myBlockId; }
+								if (isTransparent(getBlock(blkx,blky,blkz+1))) {surfaceBlocksFaces++; chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+1] = (short) myBlockId; }
 								
-								if (true) {surfaceBlocksFaces++; chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+3] = (short) myBlockId; }
-								if (true) {surfaceBlocksFaces++; chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+2] = (short) myBlockId; }
-								if (true) {surfaceBlocksFaces++; chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+5] = (short) myBlockId; }
-								if (true) {surfaceBlocksFaces++; chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+4] = (short) myBlockId; }
-								if (true) {surfaceBlocksFaces++; chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+0] = (short) myBlockId; }
-								if (true) {surfaceBlocksFaces++; chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+1] = (short) myBlockId; }
+//								if (true) {surfaceBlocksFaces++; chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+3] = (short) myBlockId; }
+//								if (true) {surfaceBlocksFaces++; chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+2] = (short) myBlockId; }
+//								if (true) {surfaceBlocksFaces++; chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+5] = (short) myBlockId; }
+//								if (true) {surfaceBlocksFaces++; chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+4] = (short) myBlockId; }
+//								if (true) {surfaceBlocksFaces++; chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+0] = (short) myBlockId; }
+//								if (true) {surfaceBlocksFaces++; chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+1] = (short) myBlockId; }
 							} else {
 								boolean isSurfaceBlock = false;
 								boolean[] sidesVisible = new boolean[] {false,false,false,false,false,false}; // bottom, top, right, left, front, back
@@ -170,6 +186,10 @@ public class ChunkSurfaceGenerator extends Thread {
 					int blkx = (int) Math.floor((float) blockaddr / (32f * 32f));
 					int blky = (int) Math.floor((float) blockaddr / 32f) - (blkx * 32);
 					int blkz = (int) Math.floor((float) blockaddr) - (blkx * 32 * 32) - (blky * 32);
+					
+					//blkx = blkx * 2; // used for debugging only
+					//blky = blky * 2;
+					//blkz = blkz * 2;
 					
 					if (blockaddr < 6) {
 						System.out.println(blkx + "-" + blky + "-" + blkz);
@@ -241,7 +261,7 @@ public class ChunkSurfaceGenerator extends Thread {
 						}
 					}
 					for (int j=0; j<6; j++) {
-						outputIndices[(i*6) + j - (offsetSkippedFaces * 6)] = indicesBlock[j + (fn * 6)] + (i * 4) - (offsetSkippedFaces * 4);
+						outputIndices[(i*6) + j - (offsetSkippedFaces * 6)] = (indicesBlock[j + (fn * 6)] % 4) + (i * 4) - (offsetSkippedFaces * 4); // 4 because there are (4) vector3s
 					}
 				}
 			}
