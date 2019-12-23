@@ -16,6 +16,12 @@ public class ArrayHelper {
         return tmp;
     }
     
+    public static <T> T[] remove(T[] arr, int index) {
+        T[] tmp1 = Arrays.copyOfRange(arr, 0, index);
+        T[] tmp2 = Arrays.copyOfRange(arr, index+1, arr.length);
+        return concatenate(tmp1, tmp2);
+    }
+    
     public static <T> T concatenate(T a, T b) {
         if (!a.getClass().isArray() || !b.getClass().isArray()) {
             throw new IllegalArgumentException();
