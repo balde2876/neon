@@ -155,6 +155,8 @@ public class Neon {
         glAttachShader(shaderProgram, fragmentShader);
         glLinkProgram(shaderProgram);
         glValidateProgram(shaderProgram);
+        glDeleteShader(vertexShader);
+        glDeleteShader(fragmentShader); 
 		
 		glClearColor(0.6f,0.9f,1.0f,0.0f);
 
@@ -190,8 +192,6 @@ public class Neon {
 				logger.logInfo("Exiting by user input");
 				//glfwDestroyWindow(win);
 		        glDeleteProgram(shaderProgram);
-		        glDeleteShader(vertexShader);
-		        glDeleteShader(fragmentShader);
 		        glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 				glfwSetWindowShouldClose(win, true);
 				//break;
