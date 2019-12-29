@@ -24,7 +24,7 @@ public class Chunk {
 		y = genY;
 		z = genZ;
 		
-		Neon.logger.logInfo("New Chunk ".concat(Integer.toString(genX)).concat(",").concat(Integer.toString(genY)).concat(",").concat(Integer.toString(genZ)));
+		//Neon.logger.logInfo("New Chunk ".concat(Integer.toString(genX)).concat(",").concat(Integer.toString(genY)).concat(",").concat(Integer.toString(genZ)));
 		chunksAvaliable = chksavail;
 		ChunkGenerator chunkGeneratorThread = new ChunkGenerator(); 
 		
@@ -104,11 +104,11 @@ public class Chunk {
 					chunkModelTransparent = new Model(chunkSurfaceData.vertexSurfaceTransparent, chunkSurfaceData.textureCoordsSurfaceTransparent, chunkSurfaceData.indicesSurfaceTransparent);
 					chunkModel = new Model(chunkSurfaceData.vertexSurface, chunkSurfaceData.textureCoordsSurface, chunkSurfaceData.indicesSurface);
 					chunkModelStatus[2] = true;
-					Neon.logger.logInfo("Model Generated with ".concat(Integer.toString(chunkSurfaceData.indicesSurface.length/6)).concat(" faces"));
+					//Neon.logger.logInfo("Model Generated with ".concat(Integer.toString(chunkSurfaceData.indicesSurface.length/6)).concat(" faces"));
 					//System.out.println("from ".concat(Integer.toString(indicesSurface.length/6)).concat(" blocks"));
 				}
 			} else {
-				Neon.logger.logInfo("Surfaces still generating");
+				//Neon.logger.logInfo("Surfaces still generating");
 			}
 		} else {
 			//System.out.println("Surfaces Not Generated");
@@ -116,7 +116,7 @@ public class Chunk {
 		if (lastUpdated[0] < lastBlockChange[0]) {
 			//if (!chunkModelStatus[2]) { // model not generated already
 				if (!chunkModelStatus[1]) { // surfaces not generating already
-					Neon.logger.logInfo("Spawning Surface Generator");
+					//Neon.logger.logInfo("Spawning Surface Generator");
 					ChunkSurfaceGenerator chunkGeneratorThread = new ChunkSurfaceGenerator(); 
 					
 					chunkGeneratorThread.x = x;

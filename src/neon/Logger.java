@@ -56,7 +56,7 @@ public class Logger {
 	
 	public void log(String text,LoggerType outputType) {
 		if (outputType == LoggerType.INFO) {
-			//System.out.println("[  INFO  ] " + text);
+			System.out.println("[  INFO  ] " + text);
 		} else if (outputType == LoggerType.WARNING) {
 			System.out.println(ANSI_YELLOW + ANSI_BLACK_BACKGROUND + "[  WARN  ] " + text + ANSI_RESET);
 		} else if (outputType == LoggerType.ERROR) {

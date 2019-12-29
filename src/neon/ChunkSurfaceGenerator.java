@@ -75,7 +75,7 @@ public class ChunkSurfaceGenerator extends Thread {
 	
 	public boolean updateSurfaceBlocks() {
 		boolean neededUpdate = false;
-			Neon.logger.logInfo("Updating surface blocks for chunk");
+			//Neon.logger.logInfo("Updating surface blocks for chunk");
 			chunkSurfaces = new short[32*32*32*6];
 			chunkTransparentSurfaces = new short[32*32*32*6];
 			surfaceBlocksFaces = 0;
@@ -111,11 +111,11 @@ public class ChunkSurfaceGenerator extends Thread {
 				}
 			}
 			int culledFaces = (32*32*32*6) +1 - surfaceBlocksFaces;
-			Neon.logger.logInfo("Culled ".concat(Integer.toString(culledFaces)).concat(" faces"));
+			//Neon.logger.logInfo("Culled ".concat(Integer.toString(culledFaces)).concat(" faces"));
 			if (culledFaces > 0) {
 				neededUpdate = true;
 			}
-			Neon.logger.logInfo("Chunk contains ".concat(Integer.toString(surfaceBlocksFaces)).concat(" faces"));
+			//Neon.logger.logInfo("Chunk contains ".concat(Integer.toString(surfaceBlocksFaces)).concat(" faces"));
 
 		return neededUpdate;
 	}
@@ -124,13 +124,13 @@ public class ChunkSurfaceGenerator extends Thread {
 		
 		boolean needsUpdate = updateSurfaceBlocks();
 		if (needsUpdate) {
-			Neon.logger.logInfo("Generating surface for chunk");
+			//Neon.logger.logInfo("Generating surface for chunk");
 			
 			float[] outputVertices = new float[surfaceBlocksFaces*12];
 			float[] outputTextureCoords = new float[surfaceBlocksFaces*8];
 			int[] outputIndices = new int[surfaceBlocksFaces*6];
 			
-			Neon.logger.logInfo("Generating chunk with ".concat(Integer.toString(surfaceBlocksFaces)).concat(" faces"));
+			//Neon.logger.logInfo("Generating chunk with ".concat(Integer.toString(surfaceBlocksFaces)).concat(" faces"));
 			
 			int offsetSkippedFaces = 0;
 			for (int i=0; i<chunkSurfaces.length; i++) {
@@ -315,10 +315,10 @@ public class ChunkSurfaceGenerator extends Thread {
 	public void run() { 
         try { 
             // Displaying the thread that is running 
-        	Neon.logger.logInfo("Surface generator " + Thread.currentThread().getId() + " is running"); 
+        	//Neon.logger.logInfo("Surface generator " + Thread.currentThread().getId() + " is running"); 
             generateSurface();
             
-            Neon.logger.logInfo("Surface generator " + Thread.currentThread().getId() + " has completed");
+            //Neon.logger.logInfo("Surface generator " + Thread.currentThread().getId() + " has completed");
     		//lastBlockChange[0] = System.currentTimeMillis();
             
         } catch (Exception e) { 
