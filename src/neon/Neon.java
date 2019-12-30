@@ -153,7 +153,7 @@ public class Neon {
 	    	logger.logError("Shader program wasn't able to be compiled correctly.");
 	    } else {
 	    	logger.logInfo("Shader program compiled");
-	    	//glUseProgram(shaderProgram);
+	    	glUseProgram(shaderProgram);
 	    }
         logger.logInfo(glGetProgramInfoLog(shaderProgram));
         
@@ -308,7 +308,7 @@ public class Neon {
 			
 			//chunkvar
 			
-			SkyboxRenderer.drawBox();
+			//SkyboxRenderer.drawBox();  // TEMP TEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMP
 			
 			int[] currentChunkLocation = new int[] {(int) Math.floor(playerPosition.x/32f),(int) Math.floor(playerPosition.y/32f),(int) Math.floor(playerPosition.z/32f)};
 			
@@ -393,11 +393,13 @@ public class Neon {
 			}
 			
 			//Draw2D Renderer2D = new Draw2D(width,height,(float) Math.PI/2f, new float[] {playerPosition.x,playerPosition.y,playerPosition.z}, new float[] {cameraRotation.x,cameraRotation.y,cameraRotation.z}, UITextures[0],new float[] {0f,0.4f,1f,0.6f},new float[] {0f,0f,1f,0.2f});
-			Renderer2D.update(width,height,(float) Math.PI/2f, new float[] {playerPosition.x,playerPosition.y,playerPosition.z}, new float[] {cameraRotation.x,cameraRotation.y,cameraRotation.z}, UITextures[0],new float[] {0f,0.4f,1f,0.6f},new float[] {0.3f,0f,0.7f,0.08f});
-			Renderer2D.drawBox();
+			///////Renderer2D.update(width,height,(float) Math.PI/2f, new float[] {playerPosition.x,playerPosition.y,playerPosition.z}, new float[] {cameraRotation.x,cameraRotation.y,cameraRotation.z}, UITextures[0],new float[] {0f,0.4f,1f,0.6f},new float[] {0.3f,0f,0.7f,0.08f});
+			//////Renderer2D.drawBox();
 			
 			//Draw2D TextRenderer2D = new Draw2D(width,height,(float) Math.PI/2f, new float[] {playerPosition.x,playerPosition.y,playerPosition.z}, new float[] {cameraRotation.x,cameraRotation.y,cameraRotation.z}, UIFont,new float[] {0f,0.4f,1f,0.6f},new float[] {0f,0.9f,1f,0.93f});
-			TextRenderer2D.update(width,height,(float) Math.PI/2f, new float[] {playerPosition.x,playerPosition.y,playerPosition.z}, new float[] {cameraRotation.x,cameraRotation.y,cameraRotation.z}, UIFont,new float[] {0f,0.4f,1f,0.6f},new float[] {0f,0.03f,1f,0.93f});
+			
+			
+			//////TextRenderer2D.update(width,height,(float) Math.PI/2f, new float[] {playerPosition.x,playerPosition.y,playerPosition.z}, new float[] {cameraRotation.x,cameraRotation.y,cameraRotation.z}, UIFont,new float[] {0f,0.4f,1f,0.6f},new float[] {0f,0.03f,1f,0.93f});
 			
 			long frameTime = System.nanoTime() - frameStartTime;
 			lastFPSDisplay = lastFPSDisplay + frameTime;
@@ -408,8 +410,8 @@ public class Neon {
 				currentFPS = 1/secondsPerFrame;
 			}
 			String fpscount = new DecimalFormat("#.00").format(currentFPS);
-			//TextRenderer2D.drawText(fpscount.concat(" fps"));
-			TextRenderer2D.drawTextAuto(fpscount.concat(" fps"),8);
+
+			//////TextRenderer2D.drawTextAuto(fpscount.concat(" fps"),8);
 			
 			glfwSwapBuffers(win);
 			
