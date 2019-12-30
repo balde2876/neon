@@ -28,17 +28,18 @@ import org.lwjgl.system.MemoryStack;
 
 public class Neon {
 	static Logger logger = new Logger();
+	static int shaderProgram;
 	
 	public Neon() {
 		int seed = 177013; // Seed for terrain generation
-		int worldRenderRadius = 2; // How far the player can see
-		int worldRenderHeight = 2; // How far the player can see up or down
+		int worldRenderRadius = 4; // How far the player can see
+		int worldRenderHeight = 3; // How far the player can see up or down
 		int worldRadius = worldRenderRadius+1; // How far the world will be loaded
 		int worldHeight = worldRenderHeight+1; // How far the world will be loaded up or down
 		int worldRamRecoverRadius = worldRadius + 4; // How aggressive the ram reclaimer is
 		int concurrentChunkRenderingLevel = 128; // Threads used to create chunk surfaces
-		int width = 800;//1280
-		int height = 500;//720
+		int width = 1280;//1280
+		int height = 720;//720
 		
 		float renderDistance = worldRamRecoverRadius * 128;
 		
@@ -46,6 +47,10 @@ public class Neon {
 			logger.logFatalError("GLFW INIT FAILED");
 			System.exit(1);
 		}
+		
+		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 		
 		long win = glfwCreateWindow(width,height,"Neon",0,0);
 		glfwShowWindow(win);
@@ -71,8 +76,8 @@ public class Neon {
 		
 		//glEnable(GL_LIGHTING);
 		
-		glEnable(GL_COLOR_MATERIAL);
-		glColorMaterial(GL_FRONT, GL_DIFFUSE);
+		//glEnable(GL_COLOR_MATERIAL);
+		//glColorMaterial(GL_FRONT, GL_DIFFUSE);
 		
 		//float light_ambient[] = { 0.5f, 0.5f, 0.5f, 0.5f };
 		//float light_diffuse[] = { 1.0f, 0.5f, 1.0f, 0.5f };
@@ -98,7 +103,7 @@ public class Neon {
 //		Chunk newChunk = new Chunk(0, 0, 0, seed, loadedChunks);
 //		loadedChunks = ArrayHelper.push(loadedChunks,newChunk);
 		
-		int shaderProgram = glCreateProgram();
+		shaderProgram = glCreateProgram();
 		int vertexShader = glCreateShader(GL_VERTEX_SHADER);
 		int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 		StringBuilder vertexShaderSource = new StringBuilder();
@@ -131,7 +136,7 @@ public class Neon {
 		glShaderSource(vertexShader, vertexShaderSource);
 	    glCompileShader(vertexShader);
 	    if (glGetShaderi(vertexShader, GL_COMPILE_STATUS) == GL_FALSE) {
-	    	logger.logError("Vertex shader wasn't able to be compiled correctly.");
+	    	logger.logFatalError("Vertex shader wasn't able to be compiled correctly.");
 	    } else {
 	    	logger.logInfo("Vertex shader compiled");
 	    }
@@ -139,7 +144,7 @@ public class Neon {
 	    glShaderSource(fragmentShader, fragmentShaderSource);
 	    glCompileShader(fragmentShader);
 	    if (glGetShaderi(fragmentShader, GL_COMPILE_STATUS) == GL_FALSE) {
-	    	logger.logError("Fragment shader wasn't able to be compiled correctly.");
+	    	logger.logFatalError("Fragment shader wasn't able to be compiled correctly.");
 	    } else {
 	    	logger.logInfo("Fragment shader compiled");
 	    }
@@ -150,10 +155,9 @@ public class Neon {
         glLinkProgram(shaderProgram);
         //glValidateProgram(shaderProgram);
         if (glGetProgrami(shaderProgram, GL_LINK_STATUS) == GL_FALSE) {
-	    	logger.logError("Shader program wasn't able to be compiled correctly.");
+	    	logger.logFatalError("Shader program wasn't able to be compiled correctly.");
 	    } else {
 	    	logger.logInfo("Shader program compiled");
-	    	//glUseProgram(shaderProgram);
 	    }
         logger.logInfo(glGetProgramInfoLog(shaderProgram));
         
@@ -173,9 +177,7 @@ public class Neon {
 		Vector3f cameraRotation = new Vector3f((float) (-Math.PI/2),0.0f,0.0f);
 		Vector3f playerPosition = new Vector3f(16.0f,16.0f,32.0f);
 		
-		float light_position[] = { 0.0f, 20.0f, 100.0f, 0.75f };
-		glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-		
+
 		//DrawSkybox SkyboxRenderer = new DrawSkybox(32*(worldRadius+1));
 		DrawSkybox SkyboxRenderer = new DrawSkybox(renderDistance * (float) Math.pow((float) Math.sin(Math.PI / 4),3f) );
 		
@@ -244,9 +246,6 @@ public class Neon {
 			SkyboxRenderer.updatePosition(new float[] {playerPosition.x,playerPosition.y,playerPosition.z});
 			
 			
-			glClear(GL_DEPTH_BUFFER_BIT);
-			glClear(GL_COLOR_BUFFER_BIT);
-			
 			try (MemoryStack stack = MemoryStack.stackPush()) {
 				IntBuffer pWidth = stack.mallocInt(1);
 				IntBuffer pHeight = stack.mallocInt(1);
@@ -282,22 +281,32 @@ public class Neon {
 			Matrix4f perspectiveMatrix = new Matrix4f();
 			perspectiveMatrix.perspective((float) Math.toRadians(45), (float)width/height, 0.1f, renderDistance); // last point is render distance
 
-			glMatrixMode(GL_PROJECTION);
-			glLoadIdentity();
-			FloatBuffer fb1 = BufferUtils.createFloatBuffer(16);
-			glLoadMatrixf(perspectiveMatrix.get(fb1));
 			
-			glMatrixMode(GL_MODELVIEW);
-			glLoadIdentity();
+			glClear(GL_DEPTH_BUFFER_BIT);
+			glClear(GL_COLOR_BUFFER_BIT);
+			
+			glUseProgram(shaderProgram);
+			
+			//glMatrixMode(GL_PROJECTION);
+			//glLoadIdentity();
+			FloatBuffer fb1 = BufferUtils.createFloatBuffer(16);
+			perspectiveMatrix.get(fb1);
+			//glLoadMatrixf(perspectiveMatrix.get(fb1));
+			glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projectionMatrix"),false,fb1);
+			
+			//glMatrixMode(GL_MODELVIEW);
+			//glLoadIdentity();
 			FloatBuffer fb2 = BufferUtils.createFloatBuffer(16);
-			glLoadMatrixf(viewMatrix.get(fb2));
+			viewMatrix.get(fb2);
+			//glLoadMatrixf();
+			glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelViewMatrix"),false,fb2);
 			
 			glViewport(0,0,width,height);
 			
 			//float mat_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 			//float mat_shininess[] = { 50.0f };
 			//float light_position[] = { 1.0f, 1.0f, 1.0f, 0.0f };
-			glShadeModel(GL_SMOOTH);
+			//glShadeModel(GL_SMOOTH);
 
 			//glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
 			//glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
@@ -308,7 +317,7 @@ public class Neon {
 			
 			//chunkvar
 			
-			SkyboxRenderer.drawBox();
+			//SkyboxRenderer.drawBox();  // TEMP TEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMP
 			
 			int[] currentChunkLocation = new int[] {(int) Math.floor(playerPosition.x/32f),(int) Math.floor(playerPosition.y/32f),(int) Math.floor(playerPosition.z/32f)};
 			
@@ -330,6 +339,7 @@ public class Neon {
 						if (chunkNeedsLoading) {
 							Chunk newChunk2 = new Chunk(blkx, blky, blkz, seed, loadedChunks);
 							loadedChunks = ArrayHelper.push(loadedChunks,newChunk2);
+							
 							//System.out.println("Chunks Loaded: ".concat(Integer.toString(loadedChunks.length)));
 						}
 						//Chunk newChunk = new Chunk(blkx, blky, blkz, seed);
@@ -354,9 +364,12 @@ public class Neon {
 			terrainTexture.bind();
 			
 			for (int chkid=0; chkid<loadedChunks.length; chkid++) {
-				glPushMatrix();
 				int[] chunkPosition = loadedChunks[chkid].getPosition();
-				glTranslatef((float) chunkPosition[0] * 32,(float) chunkPosition[1] * 32,(float) chunkPosition[2] * 32);
+				
+				viewMatrix.translate((float) chunkPosition[0] * 32,(float) chunkPosition[1] * 32,(float) chunkPosition[2] * 32);
+				viewMatrix.get(fb2);
+				viewMatrix.translate((float) chunkPosition[0] * -32,(float) chunkPosition[1] * -32,(float) chunkPosition[2] * -32);
+				glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelViewMatrix"),false,fb2);
 				loadedChunks[chkid].updateAvaliableChunks(loadedChunks);
 				
 				if ((loadedChunks[chkid].x > -worldRenderRadius+currentChunkLocation[0]) && (loadedChunks[chkid].x < worldRenderRadius+currentChunkLocation[0])) {
@@ -373,18 +386,20 @@ public class Neon {
 					loadedChunks[chkid].chunkModel.render();
 					
 				}
-				glPopMatrix();
 			}
 			
 			
 			for (int chkid=0; chkid<loadedChunks.length; chkid++) {
-				glPushMatrix();
 				int[] chunkPosition = loadedChunks[chkid].getPosition();
-				glTranslatef((float) chunkPosition[0] * 32,(float) chunkPosition[1] * 32,(float) chunkPosition[2] * 32);
+				
+				viewMatrix.translate((float) chunkPosition[0] * 32,(float) chunkPosition[1] * 32,(float) chunkPosition[2] * 32);
+				viewMatrix.get(fb2);
+				viewMatrix.translate((float) chunkPosition[0] * -32,(float) chunkPosition[1] * -32,(float) chunkPosition[2] * -32);
+				glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelViewMatrix"),false,fb2);
+				
 				if (loadedChunks[chkid].chunkModelStatus[2]) {
 					loadedChunks[chkid].chunkModelTransparent.render();
 				}
-				glPopMatrix();
 				if ( (chunkPosition[0]>worldRamRecoverRadius+1+currentChunkLocation[0] || chunkPosition[0]<-worldRamRecoverRadius-1+currentChunkLocation[0]) || 
 					 (chunkPosition[1]>worldRamRecoverRadius+1+currentChunkLocation[1] || chunkPosition[1]<-worldRamRecoverRadius-1+currentChunkLocation[1]) ||
 					 (chunkPosition[2]>worldRamRecoverRadius+1+currentChunkLocation[2] || chunkPosition[2]<-worldRamRecoverRadius-1+currentChunkLocation[2]) ) {
@@ -393,11 +408,13 @@ public class Neon {
 			}
 			
 			//Draw2D Renderer2D = new Draw2D(width,height,(float) Math.PI/2f, new float[] {playerPosition.x,playerPosition.y,playerPosition.z}, new float[] {cameraRotation.x,cameraRotation.y,cameraRotation.z}, UITextures[0],new float[] {0f,0.4f,1f,0.6f},new float[] {0f,0f,1f,0.2f});
-			Renderer2D.update(width,height,(float) Math.PI/2f, new float[] {playerPosition.x,playerPosition.y,playerPosition.z}, new float[] {cameraRotation.x,cameraRotation.y,cameraRotation.z}, UITextures[0],new float[] {0f,0.4f,1f,0.6f},new float[] {0.3f,0f,0.7f,0.08f});
-			Renderer2D.drawBox();
+			///////Renderer2D.update(width,height,(float) Math.PI/2f, new float[] {playerPosition.x,playerPosition.y,playerPosition.z}, new float[] {cameraRotation.x,cameraRotation.y,cameraRotation.z}, UITextures[0],new float[] {0f,0.4f,1f,0.6f},new float[] {0.3f,0f,0.7f,0.08f});
+			//////Renderer2D.drawBox();
 			
 			//Draw2D TextRenderer2D = new Draw2D(width,height,(float) Math.PI/2f, new float[] {playerPosition.x,playerPosition.y,playerPosition.z}, new float[] {cameraRotation.x,cameraRotation.y,cameraRotation.z}, UIFont,new float[] {0f,0.4f,1f,0.6f},new float[] {0f,0.9f,1f,0.93f});
-			TextRenderer2D.update(width,height,(float) Math.PI/2f, new float[] {playerPosition.x,playerPosition.y,playerPosition.z}, new float[] {cameraRotation.x,cameraRotation.y,cameraRotation.z}, UIFont,new float[] {0f,0.4f,1f,0.6f},new float[] {0f,0.03f,1f,0.93f});
+			
+			
+			//////TextRenderer2D.update(width,height,(float) Math.PI/2f, new float[] {playerPosition.x,playerPosition.y,playerPosition.z}, new float[] {cameraRotation.x,cameraRotation.y,cameraRotation.z}, UIFont,new float[] {0f,0.4f,1f,0.6f},new float[] {0f,0.03f,1f,0.93f});
 			
 			long frameTime = System.nanoTime() - frameStartTime;
 			lastFPSDisplay = lastFPSDisplay + frameTime;
@@ -408,8 +425,8 @@ public class Neon {
 				currentFPS = 1/secondsPerFrame;
 			}
 			String fpscount = new DecimalFormat("#.00").format(currentFPS);
-			//TextRenderer2D.drawText(fpscount.concat(" fps"));
-			TextRenderer2D.drawTextAuto(fpscount.concat(" fps"),8);
+
+			//////TextRenderer2D.drawTextAuto(fpscount.concat(" fps"),8);
 			
 			glfwSwapBuffers(win);
 			

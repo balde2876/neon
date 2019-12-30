@@ -11,9 +11,11 @@ public class ChunkSurfaceGenerator extends Thread {
 	public boolean[] chunkModelStatus = new boolean[] {false,false,false};
 	
 	private short[] chunkSurfaces = new short[32*32*32*6];
+	private byte[] lightingModel = new byte[32*32*32*6];
 	private int surfaceBlocksFaces = 0;
 	private short[] chunkTransparentSurfaces = new short[32*32*32*6];
 	private int surfaceBlocksFacesTransparent = 0;
+	private byte[] lightingModelTransparent = new byte[32*32*32*6];
 	
 	public ChunkSurfaceData chunkSurfaceData = new ChunkSurfaceData();
 	
@@ -77,6 +79,8 @@ public class ChunkSurfaceGenerator extends Thread {
 		boolean neededUpdate = false;
 			//Neon.logger.logInfo("Updating surface blocks for chunk");
 			chunkSurfaces = new short[32*32*32*6];
+			lightingModel = new byte[32*32*32*6];
+			lightingModelTransparent = new byte[32*32*32*6];
 			chunkTransparentSurfaces = new short[32*32*32*6];
 			surfaceBlocksFaces = 0;
 			for (int blkx=0; blkx<32; blkx++) {
@@ -85,26 +89,67 @@ public class ChunkSurfaceGenerator extends Thread {
 						int myBlockId = getBlock(blkx,blky,blkz);
 						if ((myBlockId != 0)) {
 							if (!isTransparent(myBlockId)) {
-								if (isTransparent(getBlock(blkx-1,blky,blkz))) {surfaceBlocksFaces++; chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+3] = (short) myBlockId; }
-								if (isTransparent(getBlock(blkx+1,blky,blkz))) {surfaceBlocksFaces++; chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+2] = (short) myBlockId; }
-								if (isTransparent(getBlock(blkx,blky-1,blkz))) {surfaceBlocksFaces++; chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+5] = (short) myBlockId; }
-								if (isTransparent(getBlock(blkx,blky+1,blkz))) {surfaceBlocksFaces++; chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+4] = (short) myBlockId; }
-								if (isTransparent(getBlock(blkx,blky,blkz-1))) {surfaceBlocksFaces++; chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+0] = (short) myBlockId; }
-								if (isTransparent(getBlock(blkx,blky,blkz+1))) {surfaceBlocksFaces++; chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+1] = (short) myBlockId; }
-								
-//								if (true) {surfaceBlocksFaces++; chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+3] = (short) myBlockId; }
-//								if (true) {surfaceBlocksFaces++; chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+2] = (short) myBlockId; }
-//								if (true) {surfaceBlocksFaces++; chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+5] = (short) myBlockId; }
-//								if (true) {surfaceBlocksFaces++; chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+4] = (short) myBlockId; }
-//								if (true) {surfaceBlocksFaces++; chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+0] = (short) myBlockId; }
-//								if (true) {surfaceBlocksFaces++; chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+1] = (short) myBlockId; }
+								if (isTransparent(getBlock(blkx-1,blky,blkz))) {
+									surfaceBlocksFaces++; 
+									chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+3] = (short) myBlockId; 
+									lightingModel[(((((blkx*32)+blky)*32)+blkz)*6)+3] = 90; 
+								}
+								if (isTransparent(getBlock(blkx+1,blky,blkz))) {
+									surfaceBlocksFaces++; 
+									chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+2] = (short) myBlockId; 
+									lightingModel[(((((blkx*32)+blky)*32)+blkz)*6)+2] = 110; 
+								}
+								if (isTransparent(getBlock(blkx,blky-1,blkz))) {
+									surfaceBlocksFaces++; 
+									chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+5] = (short) myBlockId; 
+									lightingModel[(((((blkx*32)+blky)*32)+blkz)*6)+5] = 80; 
+								}
+								if (isTransparent(getBlock(blkx,blky+1,blkz))) {
+									surfaceBlocksFaces++; 
+									chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+4] = (short) myBlockId; 
+									lightingModel[(((((blkx*32)+blky)*32)+blkz)*6)+4] = 100; 
+								}
+								if (isTransparent(getBlock(blkx,blky,blkz-1))) {
+									surfaceBlocksFaces++; 
+									chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+0] = (short) myBlockId; 
+									lightingModel[(((((blkx*32)+blky)*32)+blkz)*6)+0] = 40; 
+								}
+								if (isTransparent(getBlock(blkx,blky,blkz+1))) {
+									surfaceBlocksFaces++; 
+									chunkSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+1] = (short) myBlockId; 
+									lightingModel[(((((blkx*32)+blky)*32)+blkz)*6)+1] = 127; 
+								}
 							} else {
-								if (getBlock(blkx-1,blky,blkz) != myBlockId) { surfaceBlocksFacesTransparent++; chunkTransparentSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+3] = (short) myBlockId; }
-								if (getBlock(blkx+1,blky,blkz) != myBlockId) { surfaceBlocksFacesTransparent++; chunkTransparentSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+2] = (short) myBlockId; }
-								if (getBlock(blkx,blky-1,blkz) != myBlockId) { surfaceBlocksFacesTransparent++; chunkTransparentSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+5] = (short) myBlockId; }
-								if (getBlock(blkx,blky+1,blkz) != myBlockId) { surfaceBlocksFacesTransparent++; chunkTransparentSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+4] = (short) myBlockId; }
-								if (getBlock(blkx,blky,blkz-1) != myBlockId) { surfaceBlocksFacesTransparent++; chunkTransparentSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+0] = (short) myBlockId; }
-								if (getBlock(blkx,blky,blkz+1) != myBlockId) { surfaceBlocksFacesTransparent++; chunkTransparentSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+1] = (short) myBlockId; }
+								if (getBlock(blkx-1,blky,blkz) != myBlockId) { 
+									surfaceBlocksFacesTransparent++; 
+									chunkTransparentSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+3] = (short) myBlockId; 
+									lightingModelTransparent[(((((blkx*32)+blky)*32)+blkz)*6)+3] = 90; 
+								}
+								if (getBlock(blkx+1,blky,blkz) != myBlockId) { 
+									surfaceBlocksFacesTransparent++; 
+									chunkTransparentSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+2] = (short) myBlockId;
+									lightingModelTransparent[(((((blkx*32)+blky)*32)+blkz)*6)+2] = 110; 
+								}
+								if (getBlock(blkx,blky-1,blkz) != myBlockId) { 
+									surfaceBlocksFacesTransparent++; 
+									chunkTransparentSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+5] = (short) myBlockId; 
+									lightingModelTransparent[(((((blkx*32)+blky)*32)+blkz)*6)+5] = 80; 
+								}
+								if (getBlock(blkx,blky+1,blkz) != myBlockId) { 
+									surfaceBlocksFacesTransparent++; 
+									chunkTransparentSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+4] = (short) myBlockId; 
+									lightingModelTransparent[(((((blkx*32)+blky)*32)+blkz)*6)+4] = 100; 
+								}
+								if (getBlock(blkx,blky,blkz-1) != myBlockId) { 
+									surfaceBlocksFacesTransparent++; 
+									chunkTransparentSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+0] = (short) myBlockId; 
+									lightingModelTransparent[(((((blkx*32)+blky)*32)+blkz)*6)+0] = 40; 
+								}
+								if (getBlock(blkx,blky,blkz+1) != myBlockId) { 
+									surfaceBlocksFacesTransparent++; 
+									chunkTransparentSurfaces[(((((blkx*32)+blky)*32)+blkz)*6)+1] = (short) myBlockId; 
+									lightingModelTransparent[(((((blkx*32)+blky)*32)+blkz)*6)+1] = 127; 
+								}
 							}
 						}
 					}
@@ -127,6 +172,7 @@ public class ChunkSurfaceGenerator extends Thread {
 			//Neon.logger.logInfo("Generating surface for chunk");
 			
 			float[] outputVertices = new float[surfaceBlocksFaces*12];
+			float[] outputLighting = new float[surfaceBlocksFaces*12];
 			float[] outputTextureCoords = new float[surfaceBlocksFaces*8];
 			int[] outputIndices = new int[surfaceBlocksFaces*6];
 			
@@ -195,12 +241,15 @@ public class ChunkSurfaceGenerator extends Thread {
 					for (int j=0; j<12; j++) {
 						if ((j % 3) == 0) {
 							outputVertices[(i*12) + j - (offsetSkippedFaces * 12)] = verticesBlock[j + (fn * 12)] + ((float) blkx);
+							outputLighting[(i*12) + j - (offsetSkippedFaces * 12)] = ((float) lightingModel[i]) / 128f;
 						}
 						if ((j % 3) == 1) {
 							outputVertices[(i*12) + j - (offsetSkippedFaces * 12)] = verticesBlock[j + (fn * 12)] + ((float) blky);			
+							outputLighting[(i*12) + j - (offsetSkippedFaces * 12)] = ((float) lightingModel[i]) / 128f;
 						}
 						if ((j % 3) == 2) {
 							outputVertices[(i*12) + j - (offsetSkippedFaces * 12)] = verticesBlock[j + (fn * 12)] + ((float) blkz);
+							outputLighting[(i*12) + j - (offsetSkippedFaces * 12)] = ((float) lightingModel[i]) / 128f;
 						}
 					}
 					for (int j=0; j<6; j++) {
@@ -211,9 +260,11 @@ public class ChunkSurfaceGenerator extends Thread {
 			
 			chunkSurfaceData.indicesSurface = outputIndices;
 			chunkSurfaceData.vertexSurface = outputVertices;
+			chunkSurfaceData.vertexSurfaceColors = outputLighting;
 			chunkSurfaceData.textureCoordsSurface = outputTextureCoords;
 			
 			outputVertices = new float[surfaceBlocksFacesTransparent * 12];
+			outputLighting = new float[surfaceBlocksFacesTransparent * 12];
 			outputTextureCoords = new float[surfaceBlocksFacesTransparent * 8];
 			outputIndices = new int[surfaceBlocksFacesTransparent * 6];
 			
@@ -249,12 +300,15 @@ public class ChunkSurfaceGenerator extends Thread {
 					for (int j=0; j<12; j++) {
 						if ((j % 3) == 0) {
 							outputVertices[(i*12) + j - (offsetSkippedFaces * 12)] = verticesBlock[j + (fn * 12)] + ((float) blkx);
+							outputLighting[(i*12) + j - (offsetSkippedFaces * 12)] = (float) lightingModelTransparent[i] / 128f;
 						}
 						if ((j % 3) == 1) {
-							outputVertices[(i*12) + j - (offsetSkippedFaces * 12)] = verticesBlock[j + (fn * 12)] + ((float) blky);			
+							outputVertices[(i*12) + j - (offsetSkippedFaces * 12)] = verticesBlock[j + (fn * 12)] + ((float) blky);	
+							outputLighting[(i*12) + j - (offsetSkippedFaces * 12)] = (float) lightingModelTransparent[i] / 128f;
 						}
 						if ((j % 3) == 2) {
 							outputVertices[(i*12) + j - (offsetSkippedFaces * 12)] = verticesBlock[j + (fn * 12)] + ((float) blkz);
+							outputLighting[(i*12) + j - (offsetSkippedFaces * 12)] = (float) lightingModelTransparent[i] / 128f;
 						}
 					}
 					for (int j=0; j<6; j++) {
@@ -264,6 +318,7 @@ public class ChunkSurfaceGenerator extends Thread {
 			}
 
 			chunkSurfaceData.indicesSurfaceTransparent = outputIndices;
+			chunkSurfaceData.vertexSurfaceColorsTransparent = outputLighting;
 			chunkSurfaceData.vertexSurfaceTransparent = outputVertices;
 			chunkSurfaceData.textureCoordsSurfaceTransparent = outputTextureCoords;
 			chunkModelStatus[0] = true; // surfaces generated

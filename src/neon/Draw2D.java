@@ -17,6 +17,13 @@ public class Draw2D {
 	private float[] drawcoords = new float[] {0f,0f,1f,1f};
 
 	
+	private static float[] colorsBox = {			
+			1f,1f,1f,
+			1f,1f,1f,
+			1f,1f,1f,
+			1f,1f,1f,
+	};
+	
 	public Draw2D () {
 
 	}
@@ -47,7 +54,7 @@ public class Draw2D {
 			texcoords[2],texcoords[3],
 		};
 		glPushMatrix();
-		Model boxModel = new Model(verticesBox, textureCoordsBox, indicesBox);
+		Model boxModel = new Model(verticesBox, colorsBox, textureCoordsBox, indicesBox);
 		
 		float distance2D = 3.41f;
 		
@@ -163,7 +170,7 @@ public class Draw2D {
 				texcoordschar[2],texcoordschar[3],
 			};
 			glPushMatrix();
-			Model boxModel = new Model(verticesBox, textureCoordsBox, indicesBox);
+			Model boxModel = new Model(verticesBox, colorsBox, textureCoordsBox, indicesBox);
 			
 			float distance2D = 3.41f;
 			
