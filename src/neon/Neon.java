@@ -31,21 +31,23 @@ public class Neon {
 	
 	public Neon() {
 		int seed = 177013; // Seed for terrain generation
-		int worldRadius = 4; // How far the player can see
-		int worldHeight = 3; // How far the player can see up or down
+		int worldRenderRadius = 2; // How far the player can see
+		int worldRenderHeight = 2; // How far the player can see up or down
+		int worldRadius = worldRenderRadius+1; // How far the world will be loaded
+		int worldHeight = worldRenderHeight+1; // How far the world will be loaded up or down
 		int worldRamRecoverRadius = worldRadius + 4; // How aggressive the ram reclaimer is
 		int concurrentChunkRenderingLevel = 128; // Threads used to create chunk surfaces
-		int width = 1280;
-		int height = 720;
+		int width = 800;//1280
+		int height = 500;//720
 		
-		float renderDistance = 10000f;
+		float renderDistance = worldRamRecoverRadius * 128;
 		
 		if (glfwInit() != true) {
 			logger.logFatalError("GLFW INIT FAILED");
 			System.exit(1);
 		}
 		
-		long win = glfwCreateWindow(1280,720,"Neon",0,0);
+		long win = glfwCreateWindow(width,height,"Neon",0,0);
 		glfwShowWindow(win);
 		glfwMakeContextCurrent(win);
 		
@@ -67,12 +69,7 @@ public class Neon {
 	    glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
 	    //glBlendFunc(GL_ONE, GL_ZERO);
 		
-		glEnable(GL_LIGHTING);
-		glEnable(GL_LIGHT0);
-		//glLightModelfv(GL_LIGHT_MODEL_AMBIENT, new float[] {0.05f,0.05f,0.05f,1f} );
-		glLightModelfv(GL_LIGHT_MODEL_AMBIENT, new float[] {1f,1f,1f,1f} );
-		//glLightfv(GL_LIGHT0, GL_DIFFUSE, new float[] {1.5f,1.5f,1.5f,1f} );
-		glLightfv(GL_LIGHT0, GL_DIFFUSE, new float[] {0f,0f,0f,1f} );
+		//glEnable(GL_LIGHTING);
 		
 		glEnable(GL_COLOR_MATERIAL);
 		glColorMaterial(GL_FRONT, GL_DIFFUSE);
@@ -80,15 +77,6 @@ public class Neon {
 		//float light_ambient[] = { 0.5f, 0.5f, 0.5f, 0.5f };
 		//float light_diffuse[] = { 1.0f, 0.5f, 1.0f, 0.5f };
 		//float light_specular[] = { 1.0f, 1.0f, 0.5f, 0.5f };
-		
-		float light_ambient[] = { 0.5f, 0.5f, 0.5f, 1f };
-		float light_diffuse[] = { 1.0f, 0.5f, 1.0f, 0f };
-		float light_specular[] = { 1.0f, 1.0f, 0.5f, 0f };
-		
-
-		glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-		glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-		glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
 	
 		//float x = 0;
 	
@@ -144,17 +132,31 @@ public class Neon {
 	    glCompileShader(vertexShader);
 	    if (glGetShaderi(vertexShader, GL_COMPILE_STATUS) == GL_FALSE) {
 	    	logger.logError("Vertex shader wasn't able to be compiled correctly.");
+	    } else {
+	    	logger.logInfo("Vertex shader compiled");
 	    }
+	    logger.logInfo(glGetShaderInfoLog(vertexShader));
 	    glShaderSource(fragmentShader, fragmentShaderSource);
 	    glCompileShader(fragmentShader);
 	    if (glGetShaderi(fragmentShader, GL_COMPILE_STATUS) == GL_FALSE) {
 	    	logger.logError("Fragment shader wasn't able to be compiled correctly.");
+	    } else {
+	    	logger.logInfo("Fragment shader compiled");
 	    }
+	    logger.logInfo(glGetShaderInfoLog(fragmentShader));
 	    
 	    glAttachShader(shaderProgram, vertexShader);
         glAttachShader(shaderProgram, fragmentShader);
         glLinkProgram(shaderProgram);
-        glValidateProgram(shaderProgram);
+        //glValidateProgram(shaderProgram);
+        if (glGetProgrami(shaderProgram, GL_LINK_STATUS) == GL_FALSE) {
+	    	logger.logError("Shader program wasn't able to be compiled correctly.");
+	    } else {
+	    	logger.logInfo("Shader program compiled");
+	    	//glUseProgram(shaderProgram);
+	    }
+        logger.logInfo(glGetProgramInfoLog(shaderProgram));
+        
         glDeleteShader(vertexShader);
         glDeleteShader(fragmentShader); 
 		
@@ -292,18 +294,14 @@ public class Neon {
 			
 			glViewport(0,0,width,height);
 			
-			float mat_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+			//float mat_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 			//float mat_shininess[] = { 50.0f };
 			//float light_position[] = { 1.0f, 1.0f, 1.0f, 0.0f };
 			glShadeModel(GL_SMOOTH);
 
-			glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+			//glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
 			//glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
 			//glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-			
-			glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-			glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-			glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
 			
 			
 			//Chunk chunkvar = new Chunk(0, 0, 0, "nice");
@@ -360,17 +358,25 @@ public class Neon {
 				int[] chunkPosition = loadedChunks[chkid].getPosition();
 				glTranslatef((float) chunkPosition[0] * 32,(float) chunkPosition[1] * 32,(float) chunkPosition[2] * 32);
 				loadedChunks[chkid].updateAvaliableChunks(loadedChunks);
-				//loadedChunks[chkid].generateSurfaceOld();
-				if (currentlyRendering < concurrentChunkRenderingLevel) {
-					if (loadedChunks[chkid].generateSurfaces()) {
-						currentlyRendering = currentlyRendering + 1;
+				
+				if ((loadedChunks[chkid].x > -worldRenderRadius+currentChunkLocation[0]) && (loadedChunks[chkid].x < worldRenderRadius+currentChunkLocation[0])) {
+				if ((loadedChunks[chkid].y > -worldRenderRadius+currentChunkLocation[1]) && (loadedChunks[chkid].y < worldRenderRadius+currentChunkLocation[1])) {
+				if ((loadedChunks[chkid].z > -worldRenderHeight+currentChunkLocation[2]) && (loadedChunks[chkid].z < worldRenderHeight+currentChunkLocation[2])) {
+					if (currentlyRendering < concurrentChunkRenderingLevel) {
+						if (loadedChunks[chkid].generateSurfaces()) {
+							currentlyRendering = currentlyRendering + 1;
+						}
 					}
-				}
+				}}}
+				
 				if (loadedChunks[chkid].chunkModelStatus[2]) {
 					loadedChunks[chkid].chunkModel.render();
+					
 				}
 				glPopMatrix();
 			}
+			
+			
 			for (int chkid=0; chkid<loadedChunks.length; chkid++) {
 				glPushMatrix();
 				int[] chunkPosition = loadedChunks[chkid].getPosition();
@@ -380,8 +386,8 @@ public class Neon {
 				}
 				glPopMatrix();
 				if ( (chunkPosition[0]>worldRamRecoverRadius+1+currentChunkLocation[0] || chunkPosition[0]<-worldRamRecoverRadius-1+currentChunkLocation[0]) || 
-				     (chunkPosition[1]>worldRamRecoverRadius+1+currentChunkLocation[1] || chunkPosition[1]<-worldRamRecoverRadius-1+currentChunkLocation[1]) ||
-				     (chunkPosition[2]>worldRamRecoverRadius+1+currentChunkLocation[2] || chunkPosition[2]<-worldRamRecoverRadius-1+currentChunkLocation[2]) ) {
+					 (chunkPosition[1]>worldRamRecoverRadius+1+currentChunkLocation[1] || chunkPosition[1]<-worldRamRecoverRadius-1+currentChunkLocation[1]) ||
+					 (chunkPosition[2]>worldRamRecoverRadius+1+currentChunkLocation[2] || chunkPosition[2]<-worldRamRecoverRadius-1+currentChunkLocation[2]) ) {
 					loadedChunks = ArrayHelper.remove(loadedChunks,chkid);
 				}
 			}
