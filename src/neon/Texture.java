@@ -7,8 +7,7 @@ import java.nio.ByteBuffer;
 
 import javax.imageio.ImageIO;
 
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL15.*;
+import static org.lwjgl.opengl.GL33.*;
 
 import org.lwjgl.BufferUtils;
 
@@ -42,7 +41,10 @@ public class Texture {
 			glBindTexture(GL_TEXTURE_2D,id);
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+			glBindTexture(GL_TEXTURE_2D,0);
 			
 		} catch(IOException e) {
 			e.printStackTrace();
@@ -50,6 +52,8 @@ public class Texture {
 	}
 	
 	public void bind() {
+		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, id);
+		glUniform1i(glGetUniformLocation(Neon.shaderProgram, "terrainTexture"),0); // 0 for Texture0
 	}
 }

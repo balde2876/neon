@@ -1,5 +1,6 @@
 package neon;
 
+import static org.lwjgl.opengl.GL20.glGetUniformLocation;
 import static org.lwjgl.opengl.GL33.*;
 
 import java.nio.FloatBuffer;
@@ -13,7 +14,6 @@ public class Model {
 	private int vertexArrayId;
 	
 	private int vertexBufferId;
-	private int vertexAttribBufferId;
 	private int indexBufferId;
 	//private int tId;
 	//private int texturesLength;
@@ -24,38 +24,45 @@ public class Model {
 		indiciesLength = indicies.length;
 		
 		IntBuffer indexBuffer = BufferUtils.createIntBuffer(indicies.length);
-		indexBuffer.put(indicies);
+		for (int i=0; i<indicies.length; i++) {
+			indexBuffer.put(indicies[i]);
+		}
 		indexBuffer.flip();
 		
-		FloatBuffer vertexBuffer = BufferUtils.createFloatBuffer(verticies.length);
-		vertexBuffer.put(verticies);
-		vertexBuffer.flip();
-		
-		FloatBuffer vertexAttribBuffer = BufferUtils.createFloatBuffer(verticies.length);
-		for (int i=0; i<verticies.length; i++) {
-			vertexAttribBuffer.put((float) Math.random() / 2);
+		FloatBuffer vertexBuffer = BufferUtils.createFloatBuffer((verticies.length/3) * (3+3+2));
+		for (int i=0; i<(verticies.length/3); i++) {
+			vertexBuffer.put(verticies[(i*3)+0]);
+			vertexBuffer.put(verticies[(i*3)+1]);
+			vertexBuffer.put(verticies[(i*3)+2]);
+			vertexBuffer.put((float) Math.random());
+			vertexBuffer.put((float) Math.random());
+			vertexBuffer.put((float) Math.random());
+			vertexBuffer.put(textureCoordinates[(i*2)+0]);
+			vertexBuffer.put(textureCoordinates[(i*2)+1]);
+			//vertexBuffer.put(((float) i) / (verticies.length/3));
 		}
-		vertexAttribBuffer.flip();
+		vertexBuffer.flip();
 		
 		vertexArrayId = glGenVertexArrays();  
 		glBindVertexArray(vertexArrayId);
 		
 		vertexBufferId = glGenBuffers();
-		vertexAttribBufferId = glGenBuffers(); 
 		indexBufferId = glGenBuffers();
 		
 		glBindBuffer(GL_ARRAY_BUFFER, vertexBufferId);
 		glBufferData(GL_ARRAY_BUFFER, vertexBuffer, GL_STATIC_DRAW);
-		glVertexAttribPointer(0,3,GL_FLOAT,false, 3, 0);
-		glEnableVertexAttribArray(0);
+		
+		glVertexAttribPointer(glGetAttribLocation(Neon.shaderProgram, "inPosition"),3,GL_FLOAT,false, 12+12+8, 0); // 4 bytes per float, 3 used per vector, 2 vectors;
+		glEnableVertexAttribArray(glGetAttribLocation(Neon.shaderProgram, "inPosition"));
+		 
+		glVertexAttribPointer(glGetAttribLocation(Neon.shaderProgram, "inColor"),3,GL_FLOAT,false, 12+12+8, 12); 
+		glEnableVertexAttribArray(glGetAttribLocation(Neon.shaderProgram, "inColor")); 
+		
+		glVertexAttribPointer(glGetAttribLocation(Neon.shaderProgram, "inTexCoord"),2,GL_FLOAT,false, 12+12+8, 24); // 4 bytes per float, 2 per vector2;
+		glEnableVertexAttribArray(glGetAttribLocation(Neon.shaderProgram, "inTexCoord")); 
 		
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferId);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexBuffer, GL_STATIC_DRAW);
-		
-		glBindBuffer(GL_ARRAY_BUFFER, vertexAttribBufferId);
-		glBufferData(GL_ARRAY_BUFFER, vertexAttribBuffer, GL_STATIC_DRAW);
-		glVertexAttribPointer(1,3,GL_FLOAT,false, 3, 0);
-		glEnableVertexAttribArray(1);  
 		
 		glBindVertexArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -63,12 +70,14 @@ public class Model {
 	}
 	
 	public void render() {
+		glBindBuffer(GL_ARRAY_BUFFER, vertexBufferId);
 		glBindVertexArray(vertexArrayId);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferId);
 		
 		//glDrawArrays(GL_TRIANGLES, 0, indiciesLength/3);
-		glDrawElements(GL_TRIANGLES, indiciesLength/3, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, indiciesLength, GL_UNSIGNED_INT, 0);
 
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
