@@ -101,8 +101,8 @@ public class Chunk {
 					//System.out.println("Model already prepared with ".concat(Integer.toString(indicesSurface.length/6)).concat(" faces"));
 				} else {
 					
-					chunkModelTransparent = new Model(chunkSurfaceData.vertexSurfaceTransparent, chunkSurfaceData.textureCoordsSurfaceTransparent, chunkSurfaceData.indicesSurfaceTransparent);
-					chunkModel = new Model(chunkSurfaceData.vertexSurface, chunkSurfaceData.textureCoordsSurface, chunkSurfaceData.indicesSurface);
+					chunkModelTransparent = new Model(chunkSurfaceData.vertexSurfaceTransparent, chunkSurfaceData.vertexSurfaceColorsTransparent, chunkSurfaceData.textureCoordsSurfaceTransparent, chunkSurfaceData.indicesSurfaceTransparent);
+					chunkModel = new Model(chunkSurfaceData.vertexSurface, chunkSurfaceData.vertexSurfaceColors, chunkSurfaceData.textureCoordsSurface, chunkSurfaceData.indicesSurface);
 					chunkModelStatus[2] = true;
 					//Neon.logger.logInfo("Model Generated with ".concat(Integer.toString(chunkSurfaceData.indicesSurface.length/6)).concat(" faces"));
 					//System.out.println("from ".concat(Integer.toString(indicesSurface.length/6)).concat(" blocks"));

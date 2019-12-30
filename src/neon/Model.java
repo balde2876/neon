@@ -19,7 +19,7 @@ public class Model {
 	//private int texturesLength;
 	
 	private int indiciesLength;
-	public Model(float[] verticies,float[] textureCoordinates,int[] indicies) {
+	public Model(float[] verticies,float[] colors,float[] textureCoordinates,int[] indicies) {
 		//drawCount = indicies.length;
 		indiciesLength = indicies.length;
 		
@@ -34,9 +34,9 @@ public class Model {
 			vertexBuffer.put(verticies[(i*3)+0]);
 			vertexBuffer.put(verticies[(i*3)+1]);
 			vertexBuffer.put(verticies[(i*3)+2]);
-			vertexBuffer.put((float) Math.random());
-			vertexBuffer.put((float) Math.random());
-			vertexBuffer.put((float) Math.random());
+			vertexBuffer.put(colors[(i*3)+0]);
+			vertexBuffer.put(colors[(i*3)+1]);
+			vertexBuffer.put(colors[(i*3)+2]);
 			vertexBuffer.put(textureCoordinates[(i*2)+0]);
 			vertexBuffer.put(textureCoordinates[(i*2)+1]);
 			//vertexBuffer.put(((float) i) / (verticies.length/3));

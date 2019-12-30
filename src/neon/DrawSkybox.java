@@ -54,6 +54,32 @@ public class DrawSkybox {
 				0.5f*scf,-0.5f*scf,-0.5f*scf,
 				0.5f*scf,-0.5f*scf,0.5f*scf
 		};
+		float[] colorsBox = {			
+				1f,1f,1f,
+				1f,1f,1f,
+				1f,1f,1f,
+				1f,1f,1f,
+				1f,1f,1f,
+				1f,1f,1f,
+				1f,1f,1f,
+				1f,1f,1f,
+				1f,1f,1f,
+				1f,1f,1f,
+				1f,1f,1f,
+				1f,1f,1f,
+				1f,1f,1f,
+				1f,1f,1f,
+				1f,1f,1f,
+				1f,1f,1f,
+				1f,1f,1f,
+				1f,1f,1f,
+				1f,1f,1f,
+				1f,1f,1f,
+				1f,1f,1f,
+				1f,1f,1f,
+				1f,1f,1f,
+				1f,1f,1f,
+		};
 		int[] indicesBox = {
 				1,0,3,	
 				1,3,2,
@@ -100,7 +126,7 @@ public class DrawSkybox {
 						0.5f,0,
 		};
 		glPushMatrix();
-		Model boxModel = new Model(verticesBox, textureCoordsBox, indicesBox);
+		Model boxModel = new Model(verticesBox, colorsBox, textureCoordsBox, indicesBox);
 
 		glTranslatef(ply[0],ply[1],ply[2]);
 		
