@@ -1,11 +1,13 @@
 #version 330 core
-out vec4 FragColor;
 
-in vec2 TexCoords;
+uniform sampler2D terrainTexture;
 
-uniform sampler2D texture1;
+in vec3 exColor;
+in vec2 exTexCoord;
 
-void main()
-{
-    FragColor = texture(texture1, TexCoords);
+out vec4 gl_FragColor;
+
+void main() {
+	gl_FragColor = texture(terrainTexture, exTexCoord) * vec4(exColor, 1.0);
+    //gl_FragColor = vec4(exColor.x,exColor.y,exColor.z,1.0f);
 }
